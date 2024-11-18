@@ -1,0 +1,51 @@
+# This workflow installs Python dependencies, runs tests, and performs linting
+# For more information, see:
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Test & Lint
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - uses: actions/checkout@v3
+
+    # Set up Miniconda
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        python-version: 3.11.10
+
+    # Make the install script executable and run it
+    - name: Install dependencies with script
+      run: |
+        chmod +x ./install_partialaams.sh
+        ./install_partialaams.sh
+        pip install flake8 pytest
+      shell: bash
+
+    # Lint with flake8
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        if [ -f lint.sh ]; then ./lint.sh; fi
+      shell: bash
+
+    # Test with pytest
+    - name: Test with pytest
+      run: |
+        if [ -f pytest.sh ]; then ./pytest.sh; else pytest; fi
+      shell: bash

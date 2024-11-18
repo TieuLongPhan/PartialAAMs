@@ -1,0 +1,5 @@
+2024-11-18 16:48:23,462 - INFO - Load database
+2024-11-18 16:48:23,709 - INFO - Start to extend
+2024-11-18 16:48:36,438 - INFO - Total processing time: 12.73 seconds
+2024-11-18 16:48:36,438 - INFO - Average time per entry: 12.73 seconds
+2024-11-18 16:48:36,438 - INFO - More than 1 solution :1
