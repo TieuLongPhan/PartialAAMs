@@ -1,38 +1,36 @@
-import rdkit.Chem.rdmolfiles as rdmolfiles
-from aamutils.utils import set_aam, graph_to_mol
-from aamutils.algorithm.ilp import expand_partial_aam_balanced
-import networkx as nx
+from partialaams.gm_expand import gm_extend_aam_from_rsmi
+from partialaams.ilp_expand import extend_aam_from_rsmi
+from synutility.SynAAM.partial_expand import PartialExpand
 
 
-def extend_aam_from_graph(G: nx.Graph, H: nx.Graph) -> str:
+def partial_aam_extension_from_smiles(rsmi: str, method: str = "ilp"):
     """
-    Extends atom-atom mappings (AAM) from two input graphs,
-    G (reactants) and H (products),by solving the AAM problem using an
-    Integer Linear Programming (ILP) approach and generating
-    a reaction SMILES (RSMI) string.
+    Extends atom mappings (AAMs) in a reaction represented in RSMI format.
 
     Parameters:
-    - G (nx.Graph): Graph representing the reactants.
-    Nodes should contain necessary attributes for AAM.
-    - H (nx.Graph): Graph representing the products.
-    Nodes should contain necessary attributes for AAM.
+    - rsmi (str): The Reaction SMILES (RSMI) string that contains atom mappings.
+    - method (str): The method to use for atom mapping extension. Options are:
+                     - 'ilp': Uses ILP-based atom mapping extension (default).
+                     - 'gm': Uses GM-based atom mapping extension.
+                     - 'syn': Uses SynAAM-based atom mapping extension.
 
     Returns:
-    - str: A reaction SMILES string (RSMI) in the format 'reactant>>product'
-    with extended atom mappings.
+    - str: The SMILES string with extended atom mappings, based on the chosen method.
+
+    Example:
+    - rsmi = "CC[CH2:3][Cl:1].[N:2]>>CC[CH2:3][N:2].[Cl:1]"
+    - extended_smiles = partial_aam_extension_from_smiles(rsmi, method="gm")
     """
-    # Solve the partial AAM problem using ILP and retrieve the mapping matrix
-    M, _, _ = expand_partial_aam_balanced(G, H)
-
-    # Apply the AAM matrix to the graphs
-    set_aam(G, H, M)
-
-    # Convert the modified graphs back to RDKit molecules
-    r_mol = graph_to_mol(G)
-    p_mol = graph_to_mol(H)
-
-    # Generate reaction SMILES string from the RDKit molecules
-    result_smiles = "{}>>{}".format(
-        rdmolfiles.MolToSmiles(r_mol), rdmolfiles.MolToSmiles(p_mol)
-    )
-    return result_smiles
+    if method == "ilp":
+        # ILP-based extension using aamutils
+        return extend_aam_from_rsmi(rsmi)
+    elif method == "gm":
+        # GM-based extension using partialaams
+        return gm_extend_aam_from_rsmi(rsmi)[0]
+    elif method == "syn":
+        # SynAAM-based extension using synutility
+        p = PartialExpand()
+        return p.expand(rsmi)
+    else:
+        # Raise an error if the provided method is not valid
+        raise ValueError("Invalid method. Choose from 'ilp', 'gm', or 'syn'.")

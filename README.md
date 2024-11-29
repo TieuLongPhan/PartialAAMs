@@ -53,7 +53,7 @@ Follow the steps below to set up the environment and install the library:
 
 ```python
 from partialaams.gm_expand import gm_extend_from_graph
-from partialaams.aam_expand import extend_aam_from_graph
+from partialaams.ilp_expand import extend_aam_from_graph
 from aamutils.utils import smiles_to_graph
 
 # Define reaction SMILES

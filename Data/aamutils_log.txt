@@ -1,4 +1,0 @@
-2024-11-18 16:47:26,519 - INFO - Load database
-2024-11-18 16:47:26,730 - INFO - Start to extend
-2024-11-18 16:47:28,584 - INFO - Total processing time: 1.85 seconds
-2024-11-18 16:47:28,584 - INFO - Average time per entry: 1.85 seconds

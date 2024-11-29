@@ -1,1 +1,3 @@
 *.pyc
+*.log
+benchmarking/benchmark_gm.py

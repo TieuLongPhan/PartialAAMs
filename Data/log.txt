@@ -1,0 +1,11 @@
+2024-11-29 16:27:03,499 - INFO - Loading database
+2024-11-29 16:27:03,506 - INFO - Loaded 1855 entries
+2024-11-29 16:27:03,506 - INFO - Starting extension with method: ilp
+2024-11-29 16:55:30,069 - INFO - Total processing time with ilp: 1706.56 seconds
+2024-11-29 16:55:30,069 - INFO - Average time per entry with ilp: 0.92 seconds
+2024-11-29 16:55:30,069 - INFO - Validating results for method: ilp
+2024-11-29 16:55:37,473 - INFO - Starting extension with method: syn
+2024-11-29 16:56:35,754 - INFO - Total processing time with syn: 58.28 seconds
+2024-11-29 16:56:35,754 - INFO - Average time per entry with syn: 0.03 seconds
+2024-11-29 16:56:35,754 - INFO - Validating results for method: syn
+2024-11-29 16:56:42,851 - INFO - Saving results

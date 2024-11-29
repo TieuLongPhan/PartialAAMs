@@ -1,8 +1,9 @@
 import numpy as np
-import networkx as nx
 import collections
-from typing import List, Tuple, Optional
+import networkx as nx
 from copy import deepcopy
+from typing import List, Tuple, Optional
+
 from rdkit.Chem.rdmolfiles import MolToSmiles
 from aamutils.utils import get_beta_map, graph_to_mol
 
