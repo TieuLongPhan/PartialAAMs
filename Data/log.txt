@@ -1,11 +1,19 @@
-2024-11-29 16:27:03,499 - INFO - Loading database
-2024-11-29 16:27:03,506 - INFO - Loaded 1855 entries
-2024-11-29 16:27:03,506 - INFO - Starting extension with method: ilp
-2024-11-29 16:55:30,069 - INFO - Total processing time with ilp: 1706.56 seconds
-2024-11-29 16:55:30,069 - INFO - Average time per entry with ilp: 0.92 seconds
-2024-11-29 16:55:30,069 - INFO - Validating results for method: ilp
-2024-11-29 16:55:37,473 - INFO - Starting extension with method: syn
-2024-11-29 16:56:35,754 - INFO - Total processing time with syn: 58.28 seconds
-2024-11-29 16:56:35,754 - INFO - Average time per entry with syn: 0.03 seconds
-2024-11-29 16:56:35,754 - INFO - Validating results for method: syn
-2024-11-29 16:56:42,851 - INFO - Saving results
+2024-11-29 16:57:37,534 - INFO - Loading database
+2024-11-29 16:57:37,542 - INFO - Loaded 1855 entries
+2024-11-29 16:57:37,542 - INFO - Starting extension with method: ilp
+2024-11-29 17:24:50,874 - INFO - Total processing time with ilp: 1633.33 seconds
+2024-11-29 17:24:50,874 - INFO - Average time per entry with ilp: 0.88 seconds
+2024-11-29 17:24:50,874 - INFO - Validating results for method: ilp
+2024-11-29 17:24:57,588 - INFO - Starting extension with method: syn
+2024-11-29 17:25:53,407 - INFO - Total processing time with syn: 55.82 seconds
+2024-11-29 17:25:53,407 - INFO - Average time per entry with syn: 0.03 seconds
+2024-11-29 17:25:53,407 - INFO - Validating results for method: syn
+2024-11-29 17:26:00,020 - INFO - 
++----------+------------+----------------+------------------+--------------------+
+| Method   |   Accuracy |   Success Rate |   Total Time (s) |   Average Time (s) |
++==========+============+================+==================+====================+
+| ilp      |        100 |            100 |          1633.33 |               0.88 |
++----------+------------+----------------+------------------+--------------------+
+| syn      |        100 |            100 |            55.82 |               0.03 |
++----------+------------+----------------+------------------+--------------------+
+2024-11-29 17:26:00,020 - INFO - Saving extended data to the database
