@@ -1,5 +1,3 @@
-aamutils>=0.0.7
-synutility>=0.0.11
-torch==2.0.1
-regex
+aamutils>=0.0.10
+synkit>=0.0.4
 tabulate

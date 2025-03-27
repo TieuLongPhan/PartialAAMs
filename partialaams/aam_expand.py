@@ -1,6 +1,6 @@
 from partialaams.gm_expand import gm_extend_aam_from_rsmi
 from partialaams.ilp_expand import extend_aam_from_rsmi
-from synutility.SynAAM.partial_expand import PartialExpand
+from synkit.Graph.ITS.its_expand import ITSExpand
 
 
 def partial_aam_extension_from_smiles(rsmi: str, method: str = "ilp"):
@@ -29,8 +29,8 @@ def partial_aam_extension_from_smiles(rsmi: str, method: str = "ilp"):
         return gm_extend_aam_from_rsmi(rsmi)[0]
     elif method == "syn":
         # SynAAM-based extension using synutility
-        p = PartialExpand()
-        return p.expand(rsmi)
+        p = ITSExpand()
+        return p.expand_aam_with_its(rsmi)
     else:
         # Raise an error if the provided method is not valid
         raise ValueError("Invalid method. Choose from 'ilp', 'gm', or 'syn'.")

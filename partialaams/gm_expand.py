@@ -9,7 +9,7 @@ from partialaams.utils import (
 
 def gm_extend_from_graph(G, H):
     M = get_aam_pairwise_indices(G, H)
-    results, _ = gm.maximum_connected_extensions(G, H, M, all_extensions=False)
+    results, _ = gm.search_complete_induced_extension(G, H, M, node_labels=True, edge_labels=True, all_extensions=False)
     Ms = [create_adjacency_matrix(value) for value in results]
     return get_list_of_rsmi(G, H, Ms)
 

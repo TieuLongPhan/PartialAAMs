@@ -1,7 +1,7 @@
 import unittest
 
-from partialaams.ilp_expand import partial_aam_extension_from_smiles
-from synutility.SynAAM.aam_validator import AAMValidator
+from partialaams.aam_expand import partial_aam_extension_from_smiles
+from synkit.Graph.ITS.aam_validator import AAMValidator
 
 
 class TestPartialAAMExtension(unittest.TestCase):

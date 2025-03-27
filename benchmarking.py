@@ -2,10 +2,10 @@ import time
 import pandas as pd
 from tabulate import tabulate
 
-from synutility.SynIO.debug import setup_logging
-from synutility.SynIO.data_type import load_database
+from synkit.IO.debug import setup_logging
+from synkit.IO.data_io import load_database
 from partialaams.aam_expand import partial_aam_extension_from_smiles
-from synutility.SynAAM.aam_validator import AAMValidator
+from synkit.Graph.ITS.aam_validator import AAMValidator
 
 # Setup logging for debugging
 logger = setup_logging(
@@ -37,7 +37,7 @@ def benchmark_extension(data, methods):
                     value["PartialAAM"], method=method
                 )
             except Exception as e:
-                value[f"AAMUtils_{method}"] = None
+                value[f"{method}"] = None
                 logger.error(f"Error processing entry with method {method}: {e}")
 
         total_time = time.time() - start_time  # Total processing time for this method
@@ -49,6 +49,7 @@ def benchmark_extension(data, methods):
 
         # Validate smiles for this method
         logger.info(f"Validating results for method: {method}")
+        data = [value for value in data if value[method]]
         validation_results = AAMValidator.validate_smiles(data, "RSMI", [method])
 
         # Process the validation results and store them along with the time
@@ -108,8 +109,9 @@ if __name__ == "__main__":
     data = load_data()
 
     # List of methods to benchmark
-    # methods = ['ilp', 'gm', 'syn']
-    methods = ["ilp", "syn"]
+    methods = ['gm', 'syn']
+    # methods = ["ilp", "syn"]
+    # methods = ["gm"]
 
     # Run benchmarking and gather results
     results = benchmark_extension(data, methods)
