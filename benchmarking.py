@@ -17,7 +17,7 @@ logger = setup_logging(
 # Load the dataset
 def load_data():
     logger.info("Loading database")
-    data = load_database("Data/benchmark.json.gz")[0:]
+    data = load_database("Data/benchmark.json.gz")[:]
     logger.info(f"Loaded {len(data)} entries")
     return data
 
@@ -34,7 +34,7 @@ def benchmark_extension(data, methods):
         for value in data:
             try:
                 value[f"{method}"] = partial_aam_extension_from_smiles(
-                    value["PartialAAM"], method=method
+                    value["partial"], method=method
                 )
             except Exception as e:
                 value[f"{method}"] = None
@@ -50,7 +50,7 @@ def benchmark_extension(data, methods):
         # Validate smiles for this method
         logger.info(f"Validating results for method: {method}")
         data = [value for value in data if value[method]]
-        validation_results = AAMValidator.validate_smiles(data, "RSMI", [method])
+        validation_results = AAMValidator.validate_smiles(data, "smart", [method])
 
         # Process the validation results and store them along with the time
         for result in validation_results:
@@ -72,7 +72,7 @@ def save_results(results):
     df_results = pd.DataFrame(results)
 
     # Save the results to a CSV file
-    df_results.to_csv("/Data/benchmark_results.csv", index=False)
+    df_results.to_csv("./Data/benchmark_results.csv", index=False)
     logger.info("Results saved to /Data/benchmark_results.csv")
 
 
@@ -109,9 +109,10 @@ if __name__ == "__main__":
     data = load_data()
 
     # List of methods to benchmark
-    methods = ['gm', 'syn']
+    # methods = ["gm", "syn", "ilp"]
     # methods = ["ilp", "syn"]
     # methods = ["gm"]
+    methods = ["syn", "gm"]
 
     # Run benchmarking and gather results
     results = benchmark_extension(data, methods)

@@ -1,5 +1,7 @@
 import gmapache as gm
-from aamutils.utils import smiles_to_graph
+from partialaams.aam_utils import smiles_to_graph
+
+# from synkit.IO.chem_converter import smiles_to_graph
 from partialaams.utils import (
     get_aam_pairwise_indices,
     create_adjacency_matrix,
@@ -9,7 +11,9 @@ from partialaams.utils import (
 
 def gm_extend_from_graph(G, H):
     M = get_aam_pairwise_indices(G, H)
-    results, _ = gm.search_complete_induced_extension(G, H, M, node_labels=True, edge_labels=True, all_extensions=False)
+    results, _ = gm.search_complete_induced_extension(
+        G, H, M, node_labels=True, edge_labels=True, all_extensions=False
+    )
     Ms = [create_adjacency_matrix(value) for value in results]
     return get_list_of_rsmi(G, H, Ms)
 

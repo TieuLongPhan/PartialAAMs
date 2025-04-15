@@ -4,8 +4,10 @@ import networkx as nx
 from copy import deepcopy
 from typing import List, Tuple, Optional
 
+from rdkit import Chem
 from rdkit.Chem.rdmolfiles import MolToSmiles
-from aamutils.utils import get_beta_map, graph_to_mol
+from synkit.IO.graph_to_mol import GraphToMol
+from partialaams.aam_utils import get_beta_map, graph_to_mol
 
 
 def get_aam_pairwise_indices(G: nx.Graph, H: nx.Graph) -> list:
@@ -138,3 +140,132 @@ def get_list_of_rsmi(G: nx.Graph, H: nx.Graph, Ms: List[np.ndarray]) -> List[str
     to a transformation.
     """
     return [get_rsmi(G, H, M) for M in Ms]
+
+
+def its_decompose(
+    its_graph: nx.Graph,
+    nodes_share="typesGH",
+    edges_share="order",
+    use_atom_map: bool = False,
+):
+    """
+    Decompose an ITS graph into two separate graphs G and H based on shared
+    node and edge attributes.
+
+    Parameters:
+    - its_graph (nx.Graph): The integrated transition state (ITS) graph.
+    - nodes_share (str): Node attribute key that stores tuples with node attributes
+    or G and H.
+    - edges_share (str): Edge attribute key that stores tuples with edge attributes
+    for G and H.
+
+    Returns:
+    - Tuple[nx.Graph, nx.Graph]: A tuple containing the two graphs G and H.
+    """
+    G = nx.Graph()
+    H = nx.Graph()
+
+    # Decompose nodes
+    for node, data in its_graph.nodes(data=True):
+        if nodes_share in data:
+            node_attr_g, node_attr_h = data[nodes_share]
+            # Determine the value for 'atom_map'.
+            atom_map_value = data.get("atom_map", node) if use_atom_map else node
+            # Unpack node attributes for G
+            G.add_node(
+                node,
+                element=node_attr_g[0],
+                aromatic=node_attr_g[1],
+                hcount=node_attr_g[2],
+                charge=node_attr_g[3],
+                neighbors=node_attr_g[4],
+                atom_map=atom_map_value,
+            )
+            # Unpack node attributes for H
+            H.add_node(
+                node,
+                element=node_attr_h[0],
+                aromatic=node_attr_h[1],
+                hcount=node_attr_h[2],
+                charge=node_attr_h[3],
+                neighbors=node_attr_h[4],
+                atom_map=atom_map_value,
+            )
+
+    # Decompose edges
+    for u, v, data in its_graph.edges(data=True):
+        if edges_share in data:
+            order_g, order_h = data[edges_share]
+            if order_g > 0:  # Assuming 0 means no edge in G
+                G.add_edge(u, v, order=order_g)
+            if order_h > 0:  # Assuming 0 means no edge in H
+                H.add_edge(u, v, order=order_h)
+
+    return G, H
+
+
+def _get_partial_aam(rc: nx.Graph, its: nx.Graph) -> str:
+    """
+    Generate a partial atom-atom mapping SMILES string from
+    a reactant graph and an ITS graph.
+
+    This function performs the following steps:
+      1. Deep copies the ITS graph to avoid modifying the original.
+      2. Iterates through each node in the copied ITS graph; if a node is not present
+         in the reactant graph (rc), its 'atom_map' attribute is set to 0.
+      3. Decomposes the modified graph into two subgraphs using `its_decompose`
+         (one for retained mapping and one for partial mapping).
+      4. Converts the resulting subgraphs into RDKit molecule objects with hydrogen count
+         consideration using GraphToMol.
+      5. Generates SMILES strings from both molecules and concatenates them in the format:
+         "retained_smiles>>partial_smiles".
+
+    Parameters:
+      rc (nx.Graph): The reactant graph.
+      its (nx.Graph): The integrated transition state (ITS) graph to decompose.
+
+    Returns:
+      str: A SMILES string in the format "retained_smiles>>partial_smiles".
+
+    Raises:
+      RuntimeError: If an error occurs during graph decomposition, molecule conversion,
+                    or SMILES generation.
+    """
+    # Create a set of reactant nodes for efficient membership checking.
+    rc_nodes = set(rc.nodes())
+
+    # Deep copy the ITS graph to ensure the original graph remains unmodified.
+    graph = deepcopy(its)
+
+    # Update the 'atom_map' attribute for nodes not present in the reactant graph.
+    for node, _ in graph.nodes(data=True):
+        if node not in rc_nodes:
+            graph.nodes[node]["atom_map"] = 0
+
+    # Decompose the ITS graph into two subgraphs using the its_decompose function.
+    try:
+        retained_graph, partial_graph = its_decompose(graph, use_atom_map=True)
+    except Exception as e:
+        raise RuntimeError("Error during ITS graph decomposition: " + str(e)) from e
+
+    # Convert the decomposed graphs into RDKit molecules.
+    converter = GraphToMol()
+    try:
+        retained_mol = converter.graph_to_mol(retained_graph, use_h_count=True)
+        partial_mol = converter.graph_to_mol(partial_graph, use_h_count=True)
+    except Exception as e:
+        raise RuntimeError(
+            "Error converting graphs to RDKit molecules: " + str(e)
+        ) from e
+
+    # Generate SMILES strings for both molecules.
+    try:
+        retained_smiles = Chem.MolToSmiles(retained_mol)
+        partial_smiles = Chem.MolToSmiles(partial_mol)
+    except Exception as e:
+        raise RuntimeError(
+            "Error generating SMILES from RDKit molecules: " + str(e)
+        ) from e
+
+    # Return the concatenated SMILES string representing the mapping.
+    return f"{retained_smiles}>>{partial_smiles}"

@@ -1,7 +1,7 @@
 import networkx as nx
 import rdkit.Chem.rdmolfiles as rdmolfiles
 from aamutils.algorithm.ilp import expand_partial_aam_balanced
-from aamutils.utils import set_aam, graph_to_mol, smiles_to_graph
+from partialaams.aam_utils import set_aam, graph_to_mol, smiles_to_graph
 
 
 def extend_aam_from_graph(G: nx.Graph, H: nx.Graph) -> str:
