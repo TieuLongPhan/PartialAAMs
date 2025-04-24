@@ -1,6 +1,10 @@
+import os
 import time
+import gc
+import psutil
 import pandas as pd
 from tabulate import tabulate
+from multiprocessing import Process, Queue
 
 from synkit.IO.debug import setup_logging
 from synkit.IO.data_io import load_database
@@ -8,120 +12,107 @@ from partialaams.aam_expand import partial_aam_extension_from_smiles
 from synkit.Graph.ITS.aam_validator import AAMValidator
 
 # Setup logging for debugging
-logger = setup_logging(
-    "INFO",
-    "./Data/log.txt",
-)
+logger = setup_logging("INFO", "./Data/log_test.txt")
 
-
-# Load the dataset
-def load_data():
+def load_data(limit=None):
     logger.info("Loading database")
-    data = load_database("Data/benchmark.json.gz")[:]
+    data = load_database("Data/benchmark.json.gz")
+    if limit:
+        data = data[:limit]
     logger.info(f"Loaded {len(data)} entries")
     return data
 
+def run_single_method(method, limit, queue):
+    """
+    Load data, benchmark one method in isolation (child process),
+    and put summary metrics on the queue.
+    """
+    data = load_data(limit)
+    process = psutil.Process(os.getpid())
+    gc.collect()
+    base_mem = process.memory_info().rss
 
-# Perform atom mapping extension for each method and track processing time
-def benchmark_extension(data, methods):
-    results = []
+    # Timing and mem
+    start = time.perf_counter()
+    for entry in data:
+        try:
+            entry[method] = partial_aam_extension_from_smiles(
+                entry["partial"], method=method
+            )
+        except Exception as e:
+            entry[method] = None
+    total_time = time.perf_counter() - start
 
-    for method in methods:
-        logger.info(f"Starting extension with method: {method}")
-        start_time = time.time()
+    # Peak RSS
+    peak_rss = process.memory_info().rss
+    peak_rss_mib = (peak_rss - base_mem) / (1024**2)
 
-        # Iteratively apply atom mapping extension for each method
-        for value in data:
-            try:
-                value[f"{method}"] = partial_aam_extension_from_smiles(
-                    value["partial"], method=method
-                )
-            except Exception as e:
-                value[f"{method}"] = None
-                logger.error(f"Error processing entry with method {method}: {e}")
+    # Validate
+    valid = [e for e in data if e[method]]
+    validation = AAMValidator.validate_smiles(valid, "smart", [method], "ITS")
+    
+    # Compute overall accuracy and success rate
+    accuracies = [res["accuracy"] for res in validation]
+    accuracy = sum(accuracies) / len(accuracies) if accuracies else 0.0
+    success_rate = len(valid) / len(data) if data else 0.0
 
-        total_time = time.time() - start_time  # Total processing time for this method
-        average_time = total_time / len(data) if data else 0
+    # Package summary
+    summary = {
+        "method": method,
+        "accuracy": round(accuracy, 4),
+        "success_rate": round(success_rate, 4),
+        "total_time_s": round(total_time, 2),
+        "avg_time_s": round(total_time / len(data), 4),
+        "peak_rss_mib": round(peak_rss_mib, 2),
+    }
+    queue.put(summary)
 
-        # Log results for time taken for this method
-        logger.info(f"Total processing time with {method}: {total_time:.2f} seconds")
-        logger.info(f"Average time per entry with {method}: {average_time:.2f} seconds")
-
-        # Validate smiles for this method
-        logger.info(f"Validating results for method: {method}")
-        data = [value for value in data if value[method]]
-        validation_results = AAMValidator.validate_smiles(data, "smart", [method])
-
-        # Process the validation results and store them along with the time
-        for result in validation_results:
-            result["method"] = method
-            result["total_time"] = total_time
-            result["average_time"] = average_time
-
-            # Append the processed result for this method to the results list
-            results.append(result)
-
-    return results
-
-
-# Save the final results to a CSV file
-def save_results(results):
-    logger.info("Saving results")
-
-    # Convert results to DataFrame for easier handling and analysis
-    df_results = pd.DataFrame(results)
-
-    # Save the results to a CSV file
-    df_results.to_csv("./Data/benchmark_results.csv", index=False)
-    logger.info("Results saved to /Data/benchmark_results.csv")
-
-
-# Log results in a table format
-def log_results_table(results):
-    # Prepare table for logging
-    table = []
+def log_results_table(summaries):
+    """
+    Log the summary metrics in a simple table.
+    """
     headers = [
         "Method",
         "Accuracy",
         "Success Rate",
         "Total Time (s)",
-        "Average Time (s)",
-        "Validation Results",
+        "Avg Time (s)",
+        "Peak RSS (MiB)",
     ]
-
-    for result in results:
-        row = [
-            result["method"],
-            result["accuracy"],
-            result["success_rate"],
-            f"{result['total_time']:.2f}",
-            f"{result['average_time']:.2f}",
+    table = [
+        [
+            s["method"],
+            f"{s['accuracy']:.4f}",
+            f"{s['success_rate']:.4f}",
+            f"{s['total_time_s']:.2f}",
+            f"{s['avg_time_s']:.4f}",
+            f"{s['peak_rss_mib']:.2f}",
         ]
-        table.append(row)
-
-    # Print the table to the log file using tabulate
+        for s in summaries
+    ]
     logger.info("\n" + tabulate(table, headers=headers, tablefmt="grid"))
 
-
-# Main execution
 if __name__ == "__main__":
-    # Load data
-    data = load_data()
+    # methods = ["gm", "extend", "extend_g"]
+    methods = ["gm", "extend", "extend_g"]
+    limit = None  # or None for full dataset
 
-    # List of methods to benchmark
-    # methods = ["gm", "syn", "ilp"]
-    # methods = ["ilp", "syn"]
-    # methods = ["gm"]
-    methods = ["syn", "gm"]
+    queue = Queue()
+    processes = []
+    for m in methods:
+        p = Process(target=run_single_method, args=(m, limit, queue))
+        p.start()
+        processes.append(p)
 
-    # Run benchmarking and gather results
-    results = benchmark_extension(data, methods)
+    summaries = [queue.get() for _ in methods]
+    logger.info(summaries)
+    for p in processes:
+        p.join()
 
-    # Save the results to a file
-    # save_results(results)
+    # sort summaries into the same order as `methods`
+    order = {m: i for i, m in enumerate(methods)}
+    summaries.sort(key=lambda s: order[s["method"]])
+    logger.info(summaries)
 
-    # Log the results as a table in the log file
-    log_results_table(results)
+    log_results_table(summaries)
 
-    # Optionally, save the processed data back to the database after extensions
-    logger.info("Saving extended data to the database")

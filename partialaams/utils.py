@@ -10,7 +10,7 @@ from synkit.IO.graph_to_mol import GraphToMol
 from partialaams.aam_utils import get_beta_map, graph_to_mol
 
 
-def get_aam_pairwise_indices(G: nx.Graph, H: nx.Graph) -> list:
+def get_aam_pairwise_indices(G: nx.Graph, H: nx.Graph, aam_key: str) -> list:
     """
     Generates pairwise indices from two graphs based on atom-atom mapping (aam).
 
@@ -22,8 +22,8 @@ def get_aam_pairwise_indices(G: nx.Graph, H: nx.Graph) -> list:
     - list: A list of tuples, where each tuple contains corresponding
     node indices with the same 'aam'.
     """
-    aam_to_index_G = {d["aam"]: n for n, d in G.nodes(data=True) if d["aam"] > 0}
-    aam_to_index_H = {d["aam"]: n for n, d in H.nodes(data=True) if d["aam"] > 0}
+    aam_to_index_G = {d[aam_key]: n for n, d in G.nodes(data=True) if d[aam_key] > 0}
+    aam_to_index_H = {d[aam_key]: n for n, d in H.nodes(data=True) if d[aam_key] > 0}
     return [
         (aam_to_index_G[aam], aam_to_index_H[aam])
         for aam in aam_to_index_G
@@ -105,7 +105,7 @@ def create_adjacency_matrix(pairwise_list: list) -> np.ndarray:
     return adj_matrix
 
 
-def get_rsmi(G: nx.Graph, H: nx.Graph, M: np.ndarray) -> str:
+def get_rsmi(G: nx.Graph, H: nx.Graph, M: np.ndarray, aam_key: str) -> str:
     """
     Generates a reaction SMILES (RSMI) for the transformation represented
     by a single matrix.
@@ -118,14 +118,16 @@ def get_rsmi(G: nx.Graph, H: nx.Graph, M: np.ndarray) -> str:
     Returns:
     - str: A single reaction SMILES string representing the transformed reaction.
     """
-    G_new, H_new = set_aam(G, H, M)
+    G_new, H_new = _update_mapping(G, H, M, aam_key)
     r_mol = graph_to_mol(G_new)
     p_mol = graph_to_mol(H_new)
     result = "{}>>{}".format(MolToSmiles(r_mol), MolToSmiles(p_mol))
     return result
 
 
-def get_list_of_rsmi(G: nx.Graph, H: nx.Graph, Ms: List[np.ndarray]) -> List[str]:
+def get_list_of_rsmi(
+    G: nx.Graph, H: nx.Graph, Ms: List[np.ndarray], aam_key
+) -> List[str]:
     """
     Generates a list of reaction SMILES (RSMI) strings for each transformation
     represented by the matrices in Ms.
@@ -139,7 +141,7 @@ def get_list_of_rsmi(G: nx.Graph, H: nx.Graph, Ms: List[np.ndarray]) -> List[str
     - List[str]: A list of reaction SMILES strings, each corresponding
     to a transformation.
     """
-    return [get_rsmi(G, H, M) for M in Ms]
+    return [get_rsmi(G, H, M, aam_key) for M in Ms]
 
 
 def its_decompose(
@@ -269,3 +271,50 @@ def _get_partial_aam(rc: nx.Graph, its: nx.Graph) -> str:
 
     # Return the concatenated SMILES string representing the mapping.
     return f"{retained_smiles}>>{partial_smiles}"
+
+
+def _update_mapping(G, H, mapping, aam_key="atom_map"):
+    """
+    Update node attributes in graphs G and H based on a sequential mapping.
+
+    This function first resets the node attribute specified by aam_key for every node in G and H to 0.
+    Then, for each tuple (g_node, h_node) in the mapping list, it sets:
+        G.nodes[g_node][aam_key] = i + 1
+        H.nodes[h_node][aam_key] = i + 1
+    where i is the index of the mapping (starting from 0).
+
+    Parameters:
+    -----------
+    G : networkx.Graph
+        Graph G whose nodes will be updated.
+    H : networkx.Graph
+        Graph H whose nodes will be updated.
+    mapping : list of tuples
+        A list of tuples (g_node, h_node) specifying the mapping between nodes in G and H.
+    aam_key : str, optional (default='aam')
+        The name of the node attribute to update.
+
+    Returns:
+    --------
+    (G, H) : tuple
+        The updated graphs.
+    """
+    # Reset the attribute for all nodes in G and H to 0.
+    for node in G.nodes():
+        G.nodes[node][aam_key] = 0
+    for node in H.nodes():
+        H.nodes[node][aam_key] = 0
+
+    # Update the attribute to i+1 for nodes according to the mapping.
+    for i, (g_node, h_node) in enumerate(mapping):
+        value = i + 1
+        if g_node in G:
+            G.nodes[g_node][aam_key] = value
+        else:
+            print(f"Warning: Node {g_node} not found in graph G.")
+        if h_node in H:
+            H.nodes[h_node][aam_key] = value
+        else:
+            print(f"Warning: Node {h_node} not found in graph H.")
+
+    return G, H

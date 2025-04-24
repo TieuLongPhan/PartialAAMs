@@ -125,10 +125,10 @@ def _remove_small_smiles(smiles: str) -> str:
 
 def _create_unbalanced_aam(rsmi: str, side: str = "right") -> str:
     """
-    Processes a reaction SMILES (rsmi) by removing small fragments from one or both sides, 
+    Processes a reaction SMILES (rsmi) by removing small fragments from one or both sides,
     generating an unbalanced atom-atom mapping (AAM) reaction SMILES.
 
-    The input reaction SMILES should be in the format "reactant_smiles>>product_smiles". 
+    The input reaction SMILES should be in the format "reactant_smiles>>product_smiles".
     The parameter `side` controls which side(s) to process:
       - "left"  : Process and clean the reactant (left) fragment.
       - "right" : Process and clean the product (right) fragment.
@@ -152,7 +152,9 @@ def _create_unbalanced_aam(rsmi: str, side: str = "right") -> str:
     # Validate that the reaction SMILES contains exactly one '>>'
     parts = rsmi.split(">>")
     if len(parts) != 2:
-        raise ValueError(f"Invalid reaction SMILES format: {rsmi}. Expected exactly one '>>' separator.")
+        raise ValueError(
+            f"Invalid reaction SMILES format: {rsmi}. Expected exactly one '>>' separator."
+        )
 
     # Strip extraneous whitespace.
     r, p = [part.strip() for part in parts]
@@ -160,7 +162,9 @@ def _create_unbalanced_aam(rsmi: str, side: str = "right") -> str:
     # Ensure the side parameter is valid.
     side_lower = side.lower()
     if side_lower not in ("left", "right", "both"):
-        raise ValueError(f"Invalid side value '{side}'. Expected one of 'left', 'right', or 'both'.")
+        raise ValueError(
+            f"Invalid side value '{side}'. Expected one of 'left', 'right', or 'both'."
+        )
 
     # Process the reactant side if requested.
     if side_lower in ("left", "both"):
