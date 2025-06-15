@@ -107,7 +107,8 @@ def log_results_table(summaries):
     logger.info("\n" + tabulate(table, headers=headers, tablefmt="grid"))
 
 if __name__ == "__main__":
-    methods = ["gm", "extend", "extend_g", "ilp", "syn"]
+    # methods = ["gm", "extend", "extend_g", "ilp", "syn"]
+    methods = ["gm", "extend_g"]
     limit = None  # or a small integer for quick tests
 
     queue = Queue()
