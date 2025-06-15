@@ -15,7 +15,7 @@ from synkit.IO.graph_to_mol import GraphToMol
 def gm_extend_from_graph(G, H, balance=True, aam_key="atom_map"):
     if balance:
         M = get_aam_pairwise_indices(G, H, aam_key)
-        Ms, _ = gm.search_complete_induced_extension(
+        Ms, _ = gm.search_stable_extension(
             G, H, M, node_labels=True, edge_labels=True, all_extensions=False
         )
     else:

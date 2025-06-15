@@ -77,3 +77,27 @@ for method in ("ilp", "gm", "syn", "extend", "extend_g"):
 - **`syn`**  Gluing Graph extension  
 - **`extend`**  Color reorder extension  
 - **`extend_g`**  Color reorder extension using gm isomorphism
+
+
+## Publication
+
+[Extension of Partial Atom-to-Atom Maps: Uniqueness and Algorithms]()
+
+
+### Citation
+
+TODO
+
+
+## Contributing
+- [Marcos E. González Laffitte](https://github.com/MarcosLaffitte)
+- [Tieu-Long Phan](https://tieulongphan.github.io/)
+
+
+## License
+
+This project is licensed under MIT License - see the [License](LICENSE) file for details.
+
+## Acknowledgments
+
+This project has received funding from the European Unions Horizon Europe Doctoral Network programme under the Marie-Skłodowska-Curie grant agreement No 101072930 ([TACsy](https://tacsy.eu/) -- Training Alliance for Computational)
