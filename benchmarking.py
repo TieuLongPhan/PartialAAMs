@@ -21,8 +21,9 @@ final_entry_csv = os.path.join("Data", f"entry_times_{run_id}.csv")
 os.makedirs(entry_times_dir, exist_ok=True)
 
 # Setup logging
-logger = setup_logging("INFO", f"./Data/log.txt")
+logger = setup_logging("INFO", "./Data/log.txt")
 logger.info(f"Starting benchmark run {run_id}")
+
 
 def load_data(limit=None):
     logger.info("Loading database")
@@ -31,6 +32,7 @@ def load_data(limit=None):
         data = data[:limit]
     logger.info(f"Loaded {len(data)} entries")
     return data
+
 
 def run_single_method(method, limit, queue):
     data = load_data(limit)
@@ -76,13 +78,15 @@ def run_single_method(method, limit, queue):
     }
     queue.put(summary)
 
+
 def merge_entry_times(methods):
     dfs = []
     for method in methods:
         path = os.path.join(entry_times_dir, f"{method}_times.csv")
         dfs.append(pd.read_csv(path))
     from functools import reduce
-    merged = reduce(lambda l, r: pd.merge(l, r, on="id"), dfs)
+
+    merged = reduce(lambda left, right: pd.merge(left, right, on="id"), dfs)
     merged.to_csv(final_entry_csv, index=False)
     logger.info(f"Merged entry times → {final_entry_csv}")
 
@@ -90,9 +94,16 @@ def merge_entry_times(methods):
     shutil.rmtree(entry_times_dir)
     logger.info(f"Removed temporary directory {entry_times_dir}")
 
+
 def log_results_table(summaries):
-    headers = ["Method","Accuracy","Success Rate","Total Time (s)",
-               "Avg Time (s)","Peak RSS (MiB)"]
+    headers = [
+        "Method",
+        "Accuracy",
+        "Success Rate",
+        "Total Time (s)",
+        "Avg Time (s)",
+        "Peak RSS (MiB)",
+    ]
     table = [
         [
             s["method"],
@@ -105,6 +116,7 @@ def log_results_table(summaries):
         for s in summaries
     ]
     logger.info("\n" + tabulate(table, headers=headers, tablefmt="grid"))
+
 
 if __name__ == "__main__":
     # methods = ["gm", "extend", "extend_g", "ilp", "syn"]

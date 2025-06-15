@@ -32,11 +32,13 @@ def remove_node_attributes_by_list(graph: nx.Graph, attributes: List[str]) -> nx
 
 class Extender:
     """
-    A class for extending chemical reaction graphs by comparing and mapping reaction components.
+    A class for extending chemical reaction graphs by comparing and mapping
+    reaction components.
 
     This class provides methods to identify nodes with non-zero 'atom_map' attributes,
-    remove specific edges from graphs, determine graph isomorphism, convert mappings to tuple
-    lists, and update mappings between graphs to generate an extended reaction SMILES.
+    remove specific edges from graphs, determine graph isomorphism,
+    convert mappings to tuple lists, and update mappings between graphs to
+    generate an extended reaction SMILES.
     """
 
     def __init__(self) -> None:
@@ -48,10 +50,10 @@ class Extender:
         Extract nodes from the graph that have a non-zero 'atom_map' attribute.
 
         Parameters:
-            graph (nx.Graph): A NetworkX graph where nodes include an 'atom_map' attribute.
+        - graph (nx.Graph): A NetworkX graph where nodes include an 'atom_map' attribute.
 
         Returns:
-            List[Any]: A list of node identifiers with a non-zero 'atom_map' attribute.
+        - List[Any]: A list of node identifiers with a non-zero 'atom_map' attribute.
         """
         nodes_with_attribute = []
         for node, attrs in graph.nodes(data=True):
@@ -110,27 +112,30 @@ class Extender:
         use_defaults: bool = True,
     ) -> Optional[Dict[Any, Any]]:
         """
-        Determines if two graphs are isomorphic and returns the mapping from graph_1 to graph_2.
+        Determines if two graphs are isomorphic and returns the mapping
+        from graph_1 to graph_2.
 
         If the graphs are isomorphic, returns a dictionary mapping nodes in graph_1 to
         corresponding nodes in graph_2. Otherwise, returns None.
 
         Parameters:
-            graph_1 (nx.Graph): The first graph to compare.
-            graph_2 (nx.Graph): The second graph to compare.
-            node_match (Optional[Callable]): A function for comparing node attribute dictionaries.
-                                             If None and use_defaults is True, a default match based on
-                                             "element" and "atom_map" attributes is used.
-            edge_match (Optional[Callable]): A function for comparing edge attribute dictionaries.
-                                             If None and use_defaults is True, a default match based on the
-                                             "order" attribute is used.
-            use_defaults (bool): Whether to use default matching settings (defaults to True).
+        - graph_1 (nx.Graph): The first graph to compare.
+        - graph_2 (nx.Graph): The second graph to compare.
+        - node_match (Optional[Callable]): A function for comparing node attribute
+        dictionaries. If None and use_defaults is True, a default match based on
+        "element" and "atom_map" attributes is used.
+        - edge_match (Optional[Callable]): A function for comparing edge attribute
+        dictionaries. If None and use_defaults is True, a default match based on the
+        "order" attribute is used.
+        - use_defaults (bool): Whether to use default matching settings.
+        Defaults to True.
 
         Returns:
-            Optional[Dict[Any, Any]]: Mapping of nodes from graph_1 to graph_2 if isomorphic; otherwise, None.
+        - Optional[Dict[Any, Any]]: Mapping of nodes from graph_1 to graph_2
+        if isomorphic; otherwise, None.
         """
         if use_defaults:
-            node_label_names = ["element", "atom_map", 'hcount']
+            node_label_names = ["element", "atom_map", "hcount"]
             node_label_default = ["*", 0, 0]
             edge_attribute = "order"
 
@@ -151,7 +156,8 @@ class Extender:
 
     def fit(self, rsmi: str, use_gm=False) -> str:
         """
-        Extends a reaction SMILES string by updating the mapping of atoms between reactant and product graphs.
+        Extends a reaction SMILES string by updating the mapping of atoms between
+        reactant and product graphs.
 
         The process involves:
           1. Converting reactant and product SMILES strings into graphs.
@@ -159,7 +165,8 @@ class Extender:
           3. Removing edges between these selected nodes.
           4. Determining graph isomorphism to obtain a mapping.
           5. Updating the original graphs using the new mapping.
-          6. Converting the updated graphs back into molecular objects and generating the new reaction SMILES.
+          6. Converting the updated graphs back into molecular objects and generating
+          the new reaction SMILES.
 
         Parameters:
             rsmi (str): A reaction SMILES string in the format "reactant>>product".
@@ -168,7 +175,8 @@ class Extender:
             str: The extended reaction SMILES string after mapping update.
 
         Raises:
-            ValueError: If the input reaction SMILES format is incorrect or if the graphs are not isomorphic.
+            ValueError: If the input reaction SMILES format is incorrect or
+            if the graphs are not isomorphic.
         """
         try:
             reactant_smiles, product_smiles = rsmi.split(">>")

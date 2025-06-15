@@ -76,14 +76,17 @@ def _get_partial_aam(smart) -> str:
 
 def _remove_small_smiles(smiles: str) -> str:
     """
-    Given a SMILES string, returns the SMILES string corresponding to its largest fragment.
+    Given a SMILES string, returns the SMILES string corresponding to
+    its largest fragment.
 
     This function performs the following steps:
-      1. Converts the input SMILES string to an RDKit molecule without immediate sanitization.
+      1. Converts the input SMILES string to an RDKit molecule without
+      immediate sanitization.
       2. Attempts to sanitize the molecule.
       3. Extracts all fragments of the molecule.
       4. Selects the largest fragment based on heavy atom count.
-      5. Optionally sanitizes the largest fragment and converts it back to a canonical SMILES string.
+      5. Optionally sanitizes the largest fragment and converts it back
+      to a canonical SMILES string.
 
     Parameters:
       smiles (str): The input SMILES string.
@@ -92,7 +95,8 @@ def _remove_small_smiles(smiles: str) -> str:
       str: The canonical SMILES of the largest fragment.
 
     Raises:
-      ValueError: If the input SMILES is invalid, sanitization fails, or no fragments are found.
+      ValueError: If the input SMILES is invalid, sanitization fails,
+      or no fragments are found.
     """
     # Convert the SMILES string to an RDKit molecule without sanitization.
     mol: Optional[Chem.Mol] = Chem.MolFromSmiles(smiles, sanitize=False)
@@ -139,10 +143,12 @@ def _create_unbalanced_aam(rsmi: str, side: str = "right") -> str:
 
     Parameters:
       rsmi (str): The reaction SMILES string separated by ">>".
-      side (str): Which side to process. Must be one of "left", "right", or "both" (default is "right").
+      side (str): Which side to process. Must be one of "left", "right", or "both".
+      Default is "right".
 
     Returns:
-      str: A new reaction SMILES string in the format "reactant>>product" with the specified side(s) processed.
+      str: A new reaction SMILES string in the format "reactant>>product"
+      with the specified side(s) processed.
 
     Raises:
       ValueError: If the reaction SMILES does not contain exactly one ">>" separator,
@@ -153,7 +159,8 @@ def _create_unbalanced_aam(rsmi: str, side: str = "right") -> str:
     parts = rsmi.split(">>")
     if len(parts) != 2:
         raise ValueError(
-            f"Invalid reaction SMILES format: {rsmi}. Expected exactly one '>>' separator."
+            f"Invalid reaction SMILES format: {rsmi}."
+            + " Expected exactly one '>>' separator."
         )
 
     # Strip extraneous whitespace.

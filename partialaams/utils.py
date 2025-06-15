@@ -277,7 +277,8 @@ def _update_mapping(G, H, mapping, aam_key="atom_map"):
     """
     Update node attributes in graphs G and H based on a sequential mapping.
 
-    This function first resets the node attribute specified by aam_key for every node in G and H to 0.
+    This function first resets the node attribute specified by aam_key for
+    every node in G and H to 0.
     Then, for each tuple (g_node, h_node) in the mapping list, it sets:
         G.nodes[g_node][aam_key] = i + 1
         H.nodes[h_node][aam_key] = i + 1

@@ -1,14 +1,16 @@
 import gmapache as gm
+
 # from partialaams.aam_utils import smiles_to_graph
 from synkit.IO.chem_converter import smiles_to_graph
 
 from partialaams.utils import (
     get_aam_pairwise_indices,
     # get_list_of_rsmi,
-    _update_mapping
+    _update_mapping,
 )
 from rdkit import Chem
 from synkit.IO.graph_to_mol import GraphToMol
+
 
 def gm_extend_from_graph(G, H, balance=True, aam_key="atom_map"):
     if balance:
@@ -41,19 +43,16 @@ def gm_extend_from_graph(G, H, balance=True, aam_key="atom_map"):
                 reachability=True,
             )
             Ms = [[(h, g) for g, h in mapping] for mapping in Ms]
-    
+
     # Update the mapping of the original graphs.
-    G_new, H_new = _update_mapping(
-        G, H, Ms[0], aam_key="atom_map"
-    )
+    G_new, H_new = _update_mapping(G, H, Ms[0], aam_key="atom_map")
 
     # Convert updated graphs back to molecular objects.
     reactant_mol = GraphToMol().graph_to_mol(G_new, use_h_count=True)
     product_mol = GraphToMol().graph_to_mol(H_new, use_h_count=True)
 
-        # Generate and return the new reaction SMILES string.
+    # Generate and return the new reaction SMILES string.
     return f"{Chem.MolToSmiles(reactant_mol)}>>{Chem.MolToSmiles(product_mol)}"
-
 
 
 def gm_extend_aam_from_rsmi(rsmi: str, balance=True, aam_key="atom_map") -> str:
@@ -68,11 +67,7 @@ def gm_extend_aam_from_rsmi(rsmi: str, balance=True, aam_key="atom_map") -> str:
     - str: A reaction SMILES string with extended atom mappings.
     """
     # Convert SMILES to graphs using the provided chem converter.
-    r, p = rsmi.split('>>')
-    G = smiles_to_graph(
-        r, drop_non_aam=False, use_index_as_atom_map=False
-    )
-    H = smiles_to_graph(
-        p, drop_non_aam=False, use_index_as_atom_map=False
-    )
+    r, p = rsmi.split(">>")
+    G = smiles_to_graph(r, drop_non_aam=False, use_index_as_atom_map=False)
+    H = smiles_to_graph(p, drop_non_aam=False, use_index_as_atom_map=False)
     return gm_extend_from_graph(G, H, balance, aam_key)
