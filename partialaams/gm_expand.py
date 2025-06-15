@@ -1,6 +1,4 @@
 import gmapache as gm
-
-# from partialaams.aam_utils import smiles_to_graph
 from synkit.IO.chem_converter import smiles_to_graph
 
 from partialaams.utils import (

@@ -1,0 +1,57 @@
+# ---------- build backend ----------
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ---------- core project metadata ----------
+[project]
+name = "partialaams"
+version = "0.1.0"
+description = "PartialAAMs provides a benchmarking framework for evaluating the effectiveness of Partial Atom-Atom Mappings (AAMs) extensions. It simplifies the generation, manipulation, and testing of AAMs for chemical reactions."
+readme = "README.md"
+requires-python = ">=3.11.10"
+license = "MIT"
+# optional: tell PyPI which files to include for your license
+license-files = ["LICENSE*", "COPYING*"]
+
+authors = [
+  { name = "Tieu Long Phan", email = "tieu@bioinf.uni-leipzig.de" }
+]
+
+# ---------- runtime dependencies ----------
+dependencies = [
+  # install the package that metadata calls "gmapache"
+  "gmapache @ git+https://github.com/MarcosLaffitte/GranMapache.git@main#egg=gmapache",
+  "aamutils>=0.0.10",
+  "synkit>=0.0.9",
+  "tabulate",
+  "statsmodels",
+  "statannotations",
+]
+
+# ---------- optional dependency groups ----------
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "black>=24.0.0",
+  "ruff>=0.4.0",
+]
+docs = [
+  "mkdocs-material>=9.5.0",
+  "mkdocstrings[python]>=0.25.0"
+]
+
+# ---------- URLs for PyPI ----------
+[project.urls]
+Homepage   = "https://github.com/TieuLongPhan/partialaams"
+Repository = "https://github.com/TieuLongPhan/partialaams.git"
+Issues     = "https://github.com/TieuLongPhan/partialaams/issues"
+
+# ---------- setuptools package discovery ----------
+[tool.setuptools.packages.find]
+where  = ["."]
+include = ["partialaams*"]
+
+# ---------- move egg-info into build/ ----------
+[tool.setuptools.command.egg_info]
+egg-base = "build"

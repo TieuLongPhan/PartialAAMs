@@ -11,7 +11,7 @@ from datetime import datetime
 from synkit.IO.debug import setup_logging
 from synkit.IO.data_io import load_database
 from partialaams.aam_expand import partial_aam_extension_from_smiles
-from synkit.Graph.ITS.aam_validator import AAMValidator
+from synkit.Chem.Reaction.aam_validator import AAMValidator
 
 # --- Run‐specific setup with timestamp ---
 run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -119,8 +119,7 @@ def log_results_table(summaries):
 
 
 if __name__ == "__main__":
-    # methods = ["gm", "extend", "extend_g", "ilp", "syn"]
-    methods = ["gm", "extend_g"]
+    methods = ["gm", "extend", "extend_g", "ilp"]
     limit = None  # or a small integer for quick tests
 
     queue = Queue()

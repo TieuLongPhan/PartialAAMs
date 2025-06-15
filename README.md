@@ -46,8 +46,9 @@ Follow the steps below to set up the environment and install the library:
    ```bash
    pip install -r requirements.txt
    ```
-## Usage
+## Usagebenchmark
 
+### Python Interface
 Extend a partial atom-atom mapping (AAM) directly from reaction SMILES. Choose one of five strategies:
 
 ```python
@@ -70,14 +71,45 @@ for method in ("ilp", "gm", "syn", "extend", "extend_g"):
     # assert AAMValidator.smiles_check(result, expected)
 
 ```
-## Supported methods
+### Supported methods
 
-- **`gm`**  Graph-matching extension  
+- **`gm`**  Graph-matching extension. Please refer to [https://github.com/MarcosLaffitte/GranMapache](https://github.com/MarcosLaffitte/GranMapache) 
 - **`ilp`**  ILP-based extension  
 - **`syn`**  Gluing Graph extension  
 - **`extend`**  Color reorder extension  
 - **`extend_g`**  Color reorder extension using gm isomorphism
 
+### Command-Line Interface
+
+Once you’ve installed `partialaams` (e.g. via `pip install .` in your project root), you can run the CLI with:
+
+```bash
+python -m partialaams [OPTIONS] [RSMI]
+```
+
+### Options
+
+| Flag                   | Description                                                                                                                   | Default  |
+|:-----------------------|:------------------------------------------------------------------------------------------------------------------------------|:---------|
+| `-i`, `--input`        | Path to a file with one reaction SMILES per line, **or** a single SMILES string if the file does not exist.                   | —        |
+| `RSMI`                 | Reaction SMILES string (partial AAM). Use this instead of `-i` when processing a single reaction directly.                    | —        |
+| `-m`, `--method`       | Extension strategy. One of: `gm`, `ilp`, `syn`, `extend`, `extend_g`.                                                        | `gm`     |
+| `-o`, `--output`       | File path to write the extended SMILES to. If omitted, results stream to **stdout**.                                         | stdout   |
+| `-l`, `--list-methods` | List all supported extension methods and exit.                                                                                | —        |
+
+### Examples
+
+```bash
+$ python -m partialaams -i "CC[CH2:3][Cl:1].[N:2]>>CC[CH2:3][N:2].[Cl:1]"
+>> [Cl:1][CH2:5][CH2:4][CH3:3].[N:2]>>[Cl:1].[N:2][CH2:5][CH2:4][CH3:3]
+```
+
+
+## Benchmarking
+
+```bash
+$ python benchmarking.py
+```
 
 ## Publication
 
