@@ -46,29 +46,34 @@ Follow the steps below to set up the environment and install the library:
    ```bash
    pip install -r requirements.txt
    ```
+## Usage
 
-# Usage
-
-### Example Workflow
+Extend a partial atom-atom mapping (AAM) directly from reaction SMILES. Choose one of five strategies:
 
 ```python
-from partialaams.gm_expand import gm_extend_from_graph
-from partialaams.ilp_expand import extend_aam_from_graph
-from aamutils.utils import smiles_to_graph
+from partialaams.aam_expand import partial_aam_extension_from_smiles
 
-# Define reaction SMILES
-rsmi = "CC[CH2:3][Cl:1].[N:2]>>CC[CH2:3][N:2].[Cl:1]"
+# Define your (partial) reaction SMILES
+rsmi = "[CH3][CH:1]=[CH2:2].[H:3][H:4]>>[CH3][CH:1]([H:3])[CH2:2][H:4]"
 
-# Convert SMILES to graphs
-G, H = smiles_to_graph(rsmi)
+# Expected fully-mapped SMILES
+expected = (
+    "[CH2:1]=[CH:2][CH3:3].[H:4][H:5]>>"
+    "[CH2:1]([CH:2]([CH3:3])[H:5])[H:4]"
+)
 
-# Extend the Partial AAM and generate reaction SMILES by gm
-extended_smiles_gm = gm_extend_from_graph(G, H)
-print("Extended Reaction SMILES:", extended_smiles_gm)
-
-# Extend the Partial AAM and generate reaction SMILES by ILP solver
-extended_smiles_ilp = extend_aam_from_graph(G, H)
-print("Extended Reaction SMILES:", extended_smiles_ilp)
->>"[Cl:1][CH2:3][CH2:5][CH3:4].[NH3:2]>>[ClH:1].[NH2:2][CH2:3][CH2:5][CH3:4]"
+# Try all five extension methods:
+for method in ("ilp", "gm", "syn", "extend", "extend_g"):
+    result = partial_aam_extension_from_smiles(rsmi, method=method)
+    print(f"{method:8} →", result)
+    # You can validate with AAMValidator, e.g.:
+    # assert AAMValidator.smiles_check(result, expected)
 
 ```
+## Supported methods
+
+- **`gm`**  Graph-matching extension  
+- **`ilp`**  ILP-based extension  
+- **`syn`**  Gluing Graph extension  
+- **`extend`**  Color reorder extension  
+- **`extend_g`**  Color reorder extension using gm isomorphism

@@ -1,5 +1,5 @@
 aamutils>=0.0.10
-synkit>=0.0.4
+synkit>=0.0.9
 tabulate
 statsmodels
 statannotations

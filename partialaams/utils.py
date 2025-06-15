@@ -10,6 +10,22 @@ from synkit.IO.graph_to_mol import GraphToMol
 from partialaams.aam_utils import get_beta_map, graph_to_mol
 
 
+def rename_node_attribute(graph: nx.Graph, old_attr: str, new_attr: str) -> None:
+    """
+    Rename node attribute 'old_attr' to 'new_attr' in the given graph.
+
+    Args:
+        graph (nx.Graph): The graph whose node attributes are to be renamed.
+        old_attr (str): The existing attribute name to rename.
+        new_attr (str): The new attribute name.
+
+    The function modifies the graph in-place.
+    """
+    for _, data in graph.nodes(data=True):
+        if old_attr in data:
+            data[new_attr] = data.pop(old_attr)
+
+
 def get_aam_pairwise_indices(G: nx.Graph, H: nx.Graph, aam_key: str) -> list:
     """
     Generates pairwise indices from two graphs based on atom-atom mapping (aam).

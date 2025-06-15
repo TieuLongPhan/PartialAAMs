@@ -1,7 +1,7 @@
 import unittest
 
 from partialaams.aam_expand import partial_aam_extension_from_smiles
-from synkit.Graph.ITS.aam_validator import AAMValidator
+from synkit.Chem.Reaction.aam_validator import AAMValidator
 
 
 class TestPartialAAMExtension(unittest.TestCase):
@@ -35,6 +35,20 @@ class TestPartialAAMExtension(unittest.TestCase):
         Test extension using the SynAAM-based method.
         """
         result = partial_aam_extension_from_smiles(self.rsmi, method="syn")
+        self.assertTrue(AAMValidator.smiles_check(result, self.expected))
+
+    def test_extender_nx_extension(self):
+        """
+        Test extension using the SynAAM-based method.
+        """
+        result = partial_aam_extension_from_smiles(self.rsmi, method="extend")
+        self.assertTrue(AAMValidator.smiles_check(result, self.expected))
+
+    def test_extender_gm_extension(self):
+        """
+        Test extension using the SynAAM-based method.
+        """
+        result = partial_aam_extension_from_smiles(self.rsmi, method="extend_g")
         self.assertTrue(AAMValidator.smiles_check(result, self.expected))
 
     def test_invalid_method(self):

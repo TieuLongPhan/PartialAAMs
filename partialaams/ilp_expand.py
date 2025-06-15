@@ -4,7 +4,7 @@ from aamutils.algorithm.ilp import expand_partial_aam_balanced
 from partialaams.aam_utils import set_aam, graph_to_mol, smiles_to_graph
 
 
-def extend_aam_from_graph(G: nx.Graph, H: nx.Graph) -> str:
+def extend_aam_from_graph(G: nx.Graph, H: nx.Graph, aam_key: str = "aam") -> str:
     """
     Extends atom-atom mappings (AAM) from two input graphs,
     G (reactants) and H (products),by solving the AAM problem using an
@@ -25,11 +25,11 @@ def extend_aam_from_graph(G: nx.Graph, H: nx.Graph) -> str:
     M, _, _ = expand_partial_aam_balanced(G, H)
 
     # Apply the AAM matrix to the graphs
-    set_aam(G, H, M)
+    set_aam(G, H, M, aam_key=aam_key)
 
     # Convert the modified graphs back to RDKit molecules
-    r_mol = graph_to_mol(G)
-    p_mol = graph_to_mol(H)
+    r_mol = graph_to_mol(G, aam_key=aam_key)
+    p_mol = graph_to_mol(H, aam_key=aam_key)
 
     # Generate reaction SMILES string from the RDKit molecules
     result_smiles = "{}>>{}".format(
