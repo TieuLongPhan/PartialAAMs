@@ -6,12 +6,11 @@ build-backend = "setuptools.build_meta"
 # ---------- core project metadata ----------
 [project]
 name = "partialaams"
-version = "0.2.0"
+version = "0.3.0"
 description = "PartialAAMs provides a benchmarking framework for evaluating the effectiveness of Partial Atom-Atom Mappings (AAMs) extensions. It simplifies the generation, manipulation, and testing of AAMs for chemical reactions."
 readme = "README.md"
 requires-python = ">=3.11.10"
 license = "MIT"
-# optional: tell PyPI which files to include for your license
 license-files = ["LICENSE*", "COPYING*"]
 
 authors = [
@@ -20,8 +19,6 @@ authors = [
 
 # ---------- runtime dependencies ----------
 dependencies = [
-  # install the package that metadata calls "gmapache"
-  "gmapache @ git+https://github.com/MarcosLaffitte/GranMapache.git@main#egg=gmapache",
   "aamutils>=0.0.10",
   "synkit>=0.0.9",
   "tabulate",
