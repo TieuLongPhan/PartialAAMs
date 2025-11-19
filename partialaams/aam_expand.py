@@ -1,7 +1,11 @@
-from partialaams.gm_expand import gm_extend_aam_from_rsmi
 from partialaams.ilp_expand import extend_aam_from_rsmi
 from partialaams.extender import Extender
 from synkit.Graph.ITS.its_expand import ITSExpand
+
+try:
+    from partialaams.gm_expand import gm_extend_aam_from_rsmi
+except Exception:
+    gm_extend_aam_from_rsmi = None
 
 
 def partial_aam_extension_from_smiles(rsmi: str, method: str = "ilp"):

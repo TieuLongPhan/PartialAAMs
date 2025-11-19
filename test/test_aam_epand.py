@@ -53,6 +53,7 @@ class TestPartialAAMExtension(unittest.TestCase):
         result = partial_aam_extension_from_smiles(self.rsmi, method="extend")
         self.assertTrue(AAMValidator.smiles_check(result, self.expected))
 
+    @unittest.skipUnless(GM_AVAILABLE, "gmapache not available — skipping GM test")
     def test_extender_gm_extension(self):
         """
         Test extension using the SynAAM-based method.

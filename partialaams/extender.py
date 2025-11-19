@@ -1,6 +1,9 @@
 import networkx as nx
-import gmapache as gm
 
+try:
+    import gmapache as gm
+except Exception:
+    gm = None
 
 from synkit.IO.chem_converter import smiles_to_graph
 from operator import eq

@@ -1,6 +1,7 @@
 import unittest
-from partialaams.extender import Extender
+
 from synkit.Chem.Reaction.aam_validator import AAMValidator
+from partialaams.extender import Extender
 
 try:
     import gmapache  # noqa: F401
