@@ -1,9 +1,20 @@
 import unittest
 from synkit.IO.chem_converter import rsmi_to_graph
-from partialaams.gm_expand import gm_extend_from_graph, gm_extend_aam_from_rsmi
+
+# Attempt importing gmapache and methods
+try:
+    import gmapache  # noqa: F401
+
+    GM_AVAILABLE = True
+    from partialaams.gm_expand import gm_extend_from_graph, gm_extend_aam_from_rsmi
+except Exception:
+    GM_AVAILABLE = False
+    gm_extend_from_graph, gm_extend_aam_from_rsmi = None, None
+
 from synkit.Chem.Reaction.aam_validator import AAMValidator
 
 
+@unittest.skipUnless(GM_AVAILABLE, "gmapache not available — skipping GM test")
 class TestGmExtendFromGraph(unittest.TestCase):
     def test_gm_extend_from_graph(self):
         """

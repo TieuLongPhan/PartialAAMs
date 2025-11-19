@@ -2,6 +2,13 @@ import unittest
 from partialaams.extender import Extender
 from synkit.Chem.Reaction.aam_validator import AAMValidator
 
+try:
+    import gmapache  # noqa: F401
+
+    GM_AVAILABLE = True
+except Exception:
+    GM_AVAILABLE = False
+
 
 class TestExtender(unittest.TestCase):
 
@@ -18,6 +25,7 @@ class TestExtender(unittest.TestCase):
         # Assert that the function returns the expected result
         self.assertTrue(AAMValidator.smiles_check(result_smiles, expected))
 
+    @unittest.skipUnless(GM_AVAILABLE, "gmapache not available — skipping GM test")
     def test_extender_gm_rsmi(self):
 
         rsmi = "CC[CH2:3][Cl:1].[N:2]>>CC[CH2:3][N:2].[Cl:1]"

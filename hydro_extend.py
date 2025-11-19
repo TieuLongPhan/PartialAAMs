@@ -451,8 +451,6 @@ class HComplete:
         return new_graph
 
 
-
-
 cluster = GraphCluster()
 
 

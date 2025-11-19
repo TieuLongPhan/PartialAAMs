@@ -4,6 +4,14 @@ from partialaams.aam_expand import partial_aam_extension_from_smiles
 from synkit.Chem.Reaction.aam_validator import AAMValidator
 
 
+try:
+    import gmapache  # noqa: F401
+
+    GM_AVAILABLE = True
+except Exception:
+    GM_AVAILABLE = False
+
+
 class TestPartialAAMExtension(unittest.TestCase):
 
     def setUp(self):
@@ -23,6 +31,7 @@ class TestPartialAAMExtension(unittest.TestCase):
         result = partial_aam_extension_from_smiles(self.rsmi, method="ilp")
         self.assertTrue(AAMValidator.smiles_check(result, self.expected))
 
+    @unittest.skipUnless(GM_AVAILABLE, "gmapache not available — skipping GM test")
     def test_gm_extension(self):
         """
         Test extension using the GM-based method.

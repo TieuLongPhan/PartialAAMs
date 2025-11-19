@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # ---------- core project metadata ----------
 [project]
 name = "partialaams"
-version = "0.1.0"
+version = "0.2.0"
 description = "PartialAAMs provides a benchmarking framework for evaluating the effectiveness of Partial Atom-Atom Mappings (AAMs) extensions. It simplifies the generation, manipulation, and testing of AAMs for chemical reactions."
 readme = "README.md"
 requires-python = ">=3.11.10"
