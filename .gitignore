@@ -3,3 +3,5 @@
 benchmarking/benchmark_gm.py
 *.ipynb
 dev/*
+src_GranMapache/*
+*.pdf
