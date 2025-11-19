@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # ---------- core project metadata ----------
 [project]
 name = "partialaams"
-version = "0.3.0"
+version = "0.2.0"
 description = "PartialAAMs provides a benchmarking framework for evaluating the effectiveness of Partial Atom-Atom Mappings (AAMs) extensions. It simplifies the generation, manipulation, and testing of AAMs for chemical reactions."
 readme = "README.md"
 requires-python = ">=3.11.10"
@@ -44,11 +44,11 @@ Homepage   = "https://github.com/TieuLongPhan/partialaams"
 Repository = "https://github.com/TieuLongPhan/partialaams.git"
 Issues     = "https://github.com/TieuLongPhan/partialaams/issues"
 
+# ---------- setuptools config ----------
+[tool.setuptools]
+include-package-data = true
+
 # ---------- setuptools package discovery ----------
 [tool.setuptools.packages.find]
 where  = ["."]
 include = ["partialaams*"]
-
-# ---------- move egg-info into build/ ----------
-[tool.setuptools.command.egg_info]
-egg-base = "build"
